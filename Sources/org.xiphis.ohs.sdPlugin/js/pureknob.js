@@ -565,7 +565,9 @@
 					ctx.strokeStyle = 'black';
 					ctx.textAlign = 'center';
 					ctx.textBaseline = 'middle';
-					ctx.lineWidth = 3;
+					ctx.lineWidth = 3.1;
+					ctx.shadowBlur = 3.8;
+					ctx.shadowColor = 'black';
 					ctx.strokeText(valueStr, centerX, centerY);
 					ctx.lineWidth = 1;
 					ctx.fillText(valueStr, centerX, centerY);
