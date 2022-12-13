@@ -11,7 +11,7 @@
     <body>
         <div class="sdpi-wrapper">
 
-          <div class="sdpi-item" id="select_combo">
+          <div class="sdpi-item" id="combo_sensor">
             <div class="sdpi-item-label">Sensor</div>
             <select class="sdpi-item-value select" id="sensor_name">
               <option></option>
@@ -19,24 +19,24 @@
             </select>
           </div>
 
-          <div class="sdpi-item" id="type_combo">
+          <div class="sdpi-item" id="combo_type">
             <div class="sdpi-item-label">Sensor</div>
             <select class="sdpi-item-value select" id="sensor_type">
               <option value="text">Text</option>
               <option value="knob">Dial</option>
-              <option value="graph">Graph</option>
+              <option value="line">Line</option>
               <!-- populate with items found in return from OpenHardwareMonitor -->
             </select>
           </div>
 
-          <div class="sdpi-item" id="sensor_foreground">
+          <div class="sdpi-item" id="combo_foreground">
             <div class="sdpi-item-label">Foreground</div>
-            <input type="color" class="sdpi-item-value" value="#ff8800">
+            <input type="color" class="sdpi-item-value" id="sensor_foreground" value="#ff8800">
           </div>
 
-          <div class="sdpi-item" id="sensor_background">
+          <div class="sdpi-item" id="combo_background">
             <div class="sdpi-item-label">Background</div>
-            <input type="color" class="sdpi-item-value" value="#181818">
+            <input type="color" class="sdpi-item-value" id="sensor_background" value="#181818">
           </div>
 
           <!-- END OF SDPI-WRAPPER -->

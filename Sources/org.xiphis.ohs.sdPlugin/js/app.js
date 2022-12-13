@@ -21,12 +21,12 @@ function connected(jsn) {
     $SD.on('org.xiphis.ohs.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
     $SD.on('org.xiphis.ohs.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
     $SD.on('org.xiphis.ohs.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
-    $SD.on('org.xiphis.ohs.action.propertyInspectorDidAppear', (jsonObj) => {
-        console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:');
-    });
-    $SD.on('org.xiphis.ohs.action.propertyInspectorDidDisappear', (jsonObj) => {
-        console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
-    });
+    //$SD.on('org.xiphis.ohs.action.propertyInspectorDidAppear', (jsonObj) => {
+    //    console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:');
+    //});
+    //$SD.on('org.xiphis.ohs.action.propertyInspectorDidDisappear', (jsonObj) => {
+    //    console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
+    //});
 };
 
 const engine = {
@@ -99,40 +99,20 @@ const action = {
         if (!settings || !sensor) return;
 
         if (settings.hasOwnProperty('sensor_name')) {
-            const sensorName = settings.sensor_name;
-            if (sensor) {
-                sensor.setSensorName(sensorName);
-            }
+            sensor.setSensorName(settings.sensor_name);
         }
 
         if (settings.hasOwnProperty('sensor_type')) {
-            if (sensor) {
-                sensor.setSensorType(settings.sensor_type);
-            }
+            sensor.setSensorType(settings.sensor_type);
         }
 
         if (settings.hasOwnProperty('sensor_foreground')) {
-            if (sensor) {
-                sensor.setSensorForeground(settings.sensor_foreground);
-            }
+            sensor.setSensorForeground(settings.sensor_foreground);
         }
 
         if (settings.hasOwnProperty('sensor_background')) {
-            if (sensor) {
-                sensor.setSensorBackground(settings.sensor_background);
-            }
+            sensor.setSensorBackground(settings.sensor_background);
         }
-
-        /**
-         * In this example we put a HTML-input element with id='mynameinput'
-         * into the Property Inspector's DOM. If you enter some data into that
-         * input-field it get's saved to Stream Deck persistently and the plugin
-         * will receive the updated 'didReceiveSettings' event.
-         * Here we look for this setting and use it to change the title of
-         * the key.
-         */
-
-         this.setTitle(jsn);
     },
 
     /** 
@@ -197,23 +177,6 @@ const action = {
     },
 
     /**
-     * Here's a quick demo-wrapper to show how you could change a key's title based on what you
-     * stored in settings.
-     * If you enter something into Property Inspector's name field (in this demo),
-     * it will get the title of your key.
-     * 
-     * @param {JSON} jsn // The JSON object passed from Stream Deck to the plugin, which contains the plugin's context
-     * 
-     */
-
-    setTitle: function(jsn) {
-        if (this.settings && this.settings.hasOwnProperty('mynameinput')) {
-            console.log("watch the key on your StreamDeck - it got a new title...", this.settings.mynameinput);
-            $SD.api.setTitle(jsn.context, this.settings.mynameinput);
-        }
-    },
-
-    /**
      * Finally here's a method which gets called from various events above.
      * This is just an idea on how you can act on receiving some interesting message
      * from Stream Deck.
@@ -232,6 +195,9 @@ function OpenHardwareSensor(jsonObj) {
         name = "",
         value = "",
         type = "text",
+        history = [],
+        max_history = 60,
+        count = 0,
         background = '#181818',
         foreground = '#ff8800',
         knob;
@@ -249,18 +215,93 @@ function OpenHardwareSensor(jsonObj) {
     function drawSensor() {
         type === "text" && value.Value && updateText();
         type === "knob" && value.Value && updateKnob();
+        type === "line" && history && updateLine();
         $SD.setImage(context, canvas.toDataURL());
     }
 
+    function updateLine() {
+        const ctx = canvas.getContext('2d');
+        const height = ctx.canvas.height;
+        const width = ctx.canvas.width;
+        const smaller = width < height ? width : height;
+        const centerX = 0.5 * width;
+        const centerY = 0.5 * height;
+        const fontSize = 0.15 * smaller;
+        const fontSizeString = fontSize.toString();
+        const valueStr = value.Value;
+
+        ctx.clearRect(0, 0, width, height);
+
+        let w = [];
+        for (var wx = 0, wd = (width - 1) / (max_history + 0.1); wx < width; wx += wd) {
+            w.push(wx);
+        }
+
+        const min = parseFloat(value.Min);
+        const max = Math.max(parseFloat(value.Max), min + 1);
+        const range = max - min;
+        const scale = height / range;
+
+
+        ctx.strokeStyle = background;
+        ctx.beginPath();
+        ctx.moveTo(0, height + min * scale);
+        ctx.lineTo(width, height + min * scale);
+        ctx.stroke();
+        
+        var wp = [...w];
+        ctx.beginPath();
+        for (const h of history) {
+            const x = wp.shift();
+            if ((h.Ordinal % (max_history / 3)) === 0) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+            }
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = foreground;
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 1.1;
+        var draw;
+        draw = function(x, y) {
+            ctx.moveTo(x, y);
+            draw = function(x1, y1) {
+                ctx.lineTo(x1, y1);
+            };
+        };
+
+        ctx.beginPath();
+        for (const h of history) {
+            const x = w.shift();
+            const y = height - (parseFloat(h.Value) - min) * scale;
+            draw(x, y);
+        }
+        ctx.stroke();
+
+        ctx.font = fontSizeString + 'px sans-serif';
+        ctx.fillStyle = foreground;
+        ctx.strokeStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3.1;
+        ctx.shadowBlur = 3.8;
+        ctx.shadowColor = 'black';
+        ctx.strokeText(valueStr, centerX, centerY);
+        ctx.lineWidth = 1;
+        ctx.fillText(valueStr, centerX, centerY);
+
+    }
+
     function updateText() {
-        const height = 144;
-        const width = 144;
+        const ctx = canvas.getContext('2d');
+        const height = ctx.canvas.height;
+        const width = ctx.canvas.width;
         const smaller = width < height ? width : height;
         const centerX = 0.5 * width;
         const centerY = 0.5 * height;
         const fontSize = 0.3 * smaller;
         const fontSizeString = fontSize.toString();
-        const ctx = canvas.getContext('2d');
         const valueStr = value.Value;
         ctx.clearRect(0, 0, width, height);
         ctx.font = fontSizeString + 'px sans-serif';
@@ -330,6 +371,11 @@ function OpenHardwareSensor(jsonObj) {
 
     function updateValue(sensorValue) {
         value = sensorValue;
+        value.Ordinal = count++;
+        let history_length = history.push(value);
+        if (history_length > max_history) {
+            history.shift();
+        }
         drawSensor();
     }
 
