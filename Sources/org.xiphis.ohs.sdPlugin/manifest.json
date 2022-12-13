@@ -2,25 +2,28 @@
   "Actions": [
     {
       "Icon": "action/images/actionimage", 
-      "Name": "Example Action", 
+      "Name": "Open Hardware Sensor", 
       "States": [
         {
           "Image": "action/images/action"
         }
       ], 
       "Tooltip": "This is an example tooltip", 
-      "UUID": "com.elgato.template.action"
+      "UUID": "org.xiphis.ohs.action"
     }
   ], 
   "SDKVersion": 2,
-  "Author": "Elgato", 
+  "Author": "Xiphis", 
   "CodePath": "index.html", 
   "PropertyInspectorPath": "propertyinspector/index.html", 
-  "Description": "Example description", 
-  "Name": "Stream Deck Template", 
+  "Description": "Open Hardware Monitor Sensor", 
+  "Name": "OpenHardwareSensor", 
   "Icon": "action/images/action", 
-  "URL": "https://www.elgato.com/en/gaming/stream-deck", 
-  "Version": "1.0.1",
+  "URL": "https://github.com/atcurtis/streamdeck-ohs", 
+  "Version": "1.1.0",
+  "ApplicationsToMonitor": {
+    "windows": ["OpenHardwareMonitor.exe"]
+  },
   "OS": [
     {
         "Platform": "mac", 

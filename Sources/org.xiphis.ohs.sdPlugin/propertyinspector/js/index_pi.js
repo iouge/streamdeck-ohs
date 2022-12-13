@@ -34,6 +34,9 @@ let sdpiWrapper = document.querySelector('.sdpi-wrapper');
  */
 
 let settings;
+let sensor_selector;
+//let colorPicker = new iroMin.ColorPicker("#picker", {
+//});
 
  /**
   * The 'connected' event is the first event sent to Property Inspector, after it's instance
@@ -50,6 +53,22 @@ $SD.on('connected', (jsn) => {
      * We use this to inject some dynamic CSS values (saved in 'common_pi.js'), to allow
      * drawing proper highlight-colors or progressbars.
      */
+
+    sensor_selector = OpenHardware.fetchData()
+        .then((sensors) => {
+            var selector = document.getElementById("sensor_name");
+            for (const s of sensors) {
+                if (s.id > 1 && s.Value) {
+                    var el = document.createElement("option");
+                    el.textContent = s.FullName;
+                    el.value = s.FullName;
+                    selector.appendChild(el);
+                }
+            }
+            return selector;
+        });
+
+
 
     console.log("connected");
     addDynamicStyles($SD.applicationInfo.colors, 'connectSocket');
@@ -104,6 +123,11 @@ $SD.on('sendToPropertyInspector', jsn => {
 
 const updateUI = (pl) => {
     Object.keys(pl).map(e => {
+        if (e == 'sensor_name') {
+            sensor_selector.then((foundElement) => {
+                foundElement.value = pl[e];
+            });
+        } else
         if (e && e != '') {
             const foundElement = document.querySelector(`#${e}`);
             console.log(`searching for: #${e}`, 'found:', foundElement);

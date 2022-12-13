@@ -1,0 +1,3 @@
+[submodule "Sources/org.xiphis.ohs.sdPlugin/lib"]
+	path = Sources/org.xiphis.ohs.sdPlugin/lib
+	url = https://github.com/elgatosf/streamdeck-javascript-sdk.git

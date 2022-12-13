@@ -1,9 +1,9 @@
 {
   "Description": "Use this to create your own plugin", 
-  "Name": "Stream Deck Template", 
-  "Category": "Templates", 
-  "com.elgato.template.action": {
-    "Name": "Action", 
+  "Name": "Open Hardware Sensor", 
+  "Category": "System", 
+  "org.xiphis.ohs.action": {
+    "Name": "Open Hardware Sensor", 
     "Tooltip": "This is the only action in this plugin"
   },
   "Localization": {
