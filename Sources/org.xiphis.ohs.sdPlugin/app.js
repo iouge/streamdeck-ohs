@@ -1,3 +1,4 @@
+
 /* global $CC, Utils, $SD */
 
 /**
@@ -15,9 +16,6 @@
 $SD.on('connected', (jsonObj) => connected(jsonObj));
 
 function connected(jsn) {
-    //var data = Utils.getData("http://localhost:8085/data.json");
-    //console.log("data: " + data);
-
     // Subscribe to the willAppear and other events
     $SD.on('org.xiphis.ohs.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
     $SD.on('org.xiphis.ohs.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
@@ -31,17 +29,72 @@ function connected(jsn) {
     });
 };
 
+const engine = {
+    cache: {},
+    timer: 0,
+
+    sensor: function(jsn) {
+        return this.cache[jsn.context];
+    },
+
+    register: function(jsn, sensor) {
+        this.cache[jsn.context] = sensor;
+
+        if (this.timer === 0) {
+            const self = this;
+            this.timer = setInterval(function(sx) {
+                self.onMyTimer();
+            }, 1000);
+        }
+    },
+
+    deregister: function(jsn) {
+        delete this.cache[jsn.context];
+
+        if (Object.keys(this.cache).length === 0 && this.timer !== 0) {
+            window.clearInterval(this.timer);
+            this.timer = 0;
+        }
+
+    },
+
+    onMyTimer: function () {
+        const self = this;
+        var map = {};
+        if (this.cache) {
+            for (const [key, value] of Object.entries(this.cache)) {
+                const sensor_name = value.getSensorName();
+                var listeners = map[sensor_name];
+                if (!listeners) {
+                    listeners = [value];
+                    map[sensor_name] = listeners;
+                } else {
+                    listeners.push(value);
+                }
+            }
+        }
+        OpenHardware.fetchData().then((sensors) => {
+            for (const sensor of sensors) {
+                const listeners = map[sensor.FullName];
+                if (listeners) {
+                    for (const listener of listeners) {
+                        listener.updateValue(sensor);
+                    }
+                }
+            }
+        });
+    },
+
+};
+
 // ACTIONS
 
 const action = {
     type: 'org.xiphis.ohs.action',
-    cache: {},
-    timer: 0,
-    data: {},
 
     onDidReceiveSettings: function(jsn) {
         const settings = jsn.payload.settings;
-        const sensor = this.cache[jsn.context];
+        const sensor = engine.sensor(jsn);
 
         if (!settings || !sensor) return;
 
@@ -49,7 +102,6 @@ const action = {
             const sensorName = settings.sensor_name;
             if (sensor) {
                 sensor.setSensorName(sensorName);
-                this.cache[jsn.context] = sensor;
             }
         }
 
@@ -93,60 +145,21 @@ const action = {
     onWillAppear: function (jsn) {
         if (!jsn.payload || !jsn.payload.hasOwnProperty('settings')) return;
 
-        this.cache[jsn.context] = new OpenHardwareSensor(jsn);
-
-        if (this.timer === 0) {
-            const self = this;
-            this.timer = setInterval(function(sx) {
-                self.onMyTimer();
-            }, 1000);
-        }
+        engine.register(jsn, new OpenHardwareSensor(jsn));
 
         this.onDidReceiveSettings(jsn);
     },
 
-    onMyTimer: function () {
-        const self = this;
-        var map = {};
-        if (this.cache) {
-            for (const [key, value] of Object.entries(this.cache)) {
-                const sensor_name = value.getSensorName();
-                var listeners = map[sensor_name];
-                if (!listeners) {
-                    listeners = [value];
-                    map[sensor_name] = listeners;
-                } else {
-                    listeners.push(value);
-                }
-            }
-        }
-        OpenHardware.fetchData().then((sensors) => {
-            for (const sensor of sensors) {
-                const listeners = map[sensor.FullName];
-                if (listeners) {
-                    for (const listener of listeners) {
-                        listener.updateValue(sensor);
-                    }
-                }
-            }
-        });
-    },
-
     onWillDisappear: function (jsn) {
-        let sensor = this.cache[jsn.context];
+        const sensor = engine.sensor(jsn);
         if (sensor) {
             sensor.destroySensor();
-            delete this.cache[jsn.context];
-
-            if (Object.keys(this.cache).length === 0 && this.timer !== 0) {
-                window.clearInterval(this.timer);
-                this.timer = 0;
-            }
+            engine.deregister(jsn);
         }
     },
 
     onKeyUp: function (jsn) {
-        const sensor = this.cache[jsn.context];
+        const sensor = engine.sensor(jsn);
         if (!sensor) {
             this.onWillAppear(jsn);
         } else {
