@@ -225,7 +225,7 @@ function OpenHardwareSensor(jsonObj) {
         const width = ctx.canvas.width;
         const smaller = width < height ? width : height;
         const centerX = 0.5 * width;
-        const centerY = 0.5 * height;
+        const centerY = 0.2 * height;
         const fontSize = 0.15 * smaller;
         const fontSizeString = fontSize.toString();
         const valueStr = value.Value;
@@ -233,7 +233,7 @@ function OpenHardwareSensor(jsonObj) {
         ctx.clearRect(0, 0, width, height);
 
         let w = [];
-        for (var wx = 0, wd = (width - 1) / (max_history + 0.1); wx < width; wx += wd) {
+        for (var wx = 0, wd = (width - 1) / (max_history + 0.1); wx <= width; wx += wd) {
             w.push(wx);
         }
 
@@ -244,6 +244,7 @@ function OpenHardwareSensor(jsonObj) {
 
 
         ctx.strokeStyle = background;
+        ctx.lineWidth = 3.1
         ctx.beginPath();
         ctx.moveTo(0, height + min * scale);
         ctx.lineTo(width, height + min * scale);
