@@ -20,7 +20,7 @@
   "Name": "OpenHardwareSensor", 
   "Icon": "action/images/action", 
   "URL": "https://github.com/atcurtis/streamdeck-ohs", 
-  "Version": "1.1.0",
+  "Version": "1.1.1",
   "ApplicationsToMonitor": {
     "windows": ["OpenHardwareMonitor.exe"]
   },

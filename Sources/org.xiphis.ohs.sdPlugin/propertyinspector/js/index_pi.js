@@ -33,7 +33,7 @@ let sdpiWrapper = document.querySelector('.sdpi-wrapper');
  * in Stream Deck software, we can savely cache our settings in a global variable.
  */
 
-let settings;
+let settings = {};
 let sensor_selector;
 //let colorPicker = new iroMin.ColorPicker("#picker", {
 //});
@@ -71,7 +71,6 @@ $SD.on('connected', (jsn) => {
 
 
     console.log("connected");
-    addDynamicStyles($SD.applicationInfo.colors, 'connectSocket');
 
     /**
      * Current settings are passed in the JSON node
@@ -87,7 +86,12 @@ $SD.on('connected', (jsn) => {
      * const foundObject = Utils.getProp(JSON-OBJECT, 'path.to.target', defaultValueIfNotFound)
      */
 
-    settings = Utils.getProp(jsn, 'actionInfo.payload.settings', false);
+    function getProp(jsn, str, defaultValue = {}, sep = '.') {
+        const arr = str.split(sep);
+        return arr.reduce((obj, key) => (obj && obj.hasOwnProperty(key) ? obj[key] : defaultValue), jsn);
+    }
+
+    settings = getProp(jsn, 'actionInfo.payload.settings', {});
     if (settings) {
         updateUI(settings);
     }
@@ -233,7 +237,7 @@ $SD.on('piDataChanged', (returnValue) => {
             console.log(sdpi_collection.key, " => ", sdpi_collection.value);
             settings[sdpi_collection.key] = sdpi_collection.value;
             console.log('setSettings....', settings);
-            $SD.api.setSettings($SD.uuid, settings);
+            $SD.setSettings($SD.uuid, settings);
         }
     }
  }
@@ -358,7 +362,7 @@ function prepareDOMElements(baseElement) {
                 } else {
                     path = value;
                 }
-                $SD.api.openUrl($SD.uuid, path);
+                $SD.openUrl($SD.uuid, path);
             };
         } else {
             console.log(`${value} is not a supported url`);
