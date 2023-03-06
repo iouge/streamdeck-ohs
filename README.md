@@ -12,6 +12,9 @@ Requires Stream Deck 4.1 or later.
 - fetch data from the running Open Hardware Monitor process
 - permits multiple instances of the plugin to enable displaying multiple data points.
   
+# Pictures
+![StreamDeck](https://github.com/atcurtis/streamdeck-ohs/blob/master/Screenshot%202023-03-05%20230412.png?raw=true)
+![App view](https://github.com/atcurtis/streamdeck-ohs/blob/master/Screenshot%202023-03-05%20230549.png?raw=true)
 
 ## Features:
 
