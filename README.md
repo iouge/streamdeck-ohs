@@ -28,6 +28,7 @@ Features:
 ### Pre-requisites
 
 - Open Hardware Monitor is required to be running in the background with its HTTP port open.
+- Configure Open Hardware Monitor to use port 8085 ( see [openhardware.js line 19](https://github.com/atcurtis/streamdeck-ohs/blob/master/Sources/org.xiphis.ohs.sdPlugin/propertyinspector/js/openhardware.js#L19) )
 
 ## To-Do:
 
