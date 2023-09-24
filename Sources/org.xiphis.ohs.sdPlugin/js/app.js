@@ -113,6 +113,14 @@ const action = {
         if (settings.hasOwnProperty('sensor_background')) {
             sensor.setSensorBackground(settings.sensor_background);
         }
+ 
+        if (settings.hasOwnProperty('sensor_minimum')) {
+            sensor.setSensorMinimum(settings.sensor_minimum);
+        }
+
+        if (settings.hasOwnProperty('sensor_maximum')) {
+            sensor.setSensorMaximum(settings.sensor_maximum);
+        }
     },
 
     /** 
@@ -200,6 +208,8 @@ function OpenHardwareSensor(jsonObj) {
         count = 0,
         background = '#181818',
         foreground = '#ff8800',
+        minimum = null,
+        maximum = null,
         knob;
 
     function createSensor(settings) {
@@ -330,8 +340,8 @@ function OpenHardwareSensor(jsonObj) {
                 return value.Value;
             })
         }
-        knob.setProperty("valMin", parseFloat(value.Min));
-        knob.setProperty("valMax", parseFloat(value.Max));
+        knob.setProperty("valMin", minimum == null ? parseFloat(value.Min) : minimum);
+        knob.setProperty("valMax", maximum == null ? parseFloat(value.Max) : maximum);
         knob.setProperty("val", parseFloat(value.Value));
         knob.commit();
     }
@@ -370,6 +380,24 @@ function OpenHardwareSensor(jsonObj) {
         drawSensor();
     }
 
+    function setSensorMinimum(value) {
+        if (value == null || value == "") {
+            minimum = null;
+        } else {
+            minimum = parseFloat(value);
+        }
+        drawSensor();
+    }
+
+    function setSensorMaximum(value) {
+        if (value == null || value == "") {
+            maximum = null;
+        } else {
+            maximum = parseFloat(value);
+        }
+        drawSensor();
+    }
+
     function updateValue(sensorValue) {
         value = sensorValue;
         value.Ordinal = count++;
@@ -391,6 +419,8 @@ function OpenHardwareSensor(jsonObj) {
         getSensorName: getSensorName,
         setSensorType: setSensorType,
         getSensorType: getSensorType,
+        setSensorMinimum: setSensorMinimum,
+        setSensorMaximum: setSensorMaximum,
         setSensorBackground: setSensorBackground,
         setSensorForeground: setSensorForeground
     }
