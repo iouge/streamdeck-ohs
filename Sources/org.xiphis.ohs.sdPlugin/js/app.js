@@ -259,8 +259,8 @@ function OpenHardwareSensor(jsonObj) {
             w.push(wx);
         }
 
-        const min = parseFloat(value.Min);
-        const max = Math.max(parseFloat(value.Max), min + 1);
+        const min = getMinValue();
+        const max = Math.max(getMaxValue(), min + 1);
         const range = max - min;
         const scale = height / range;
 
@@ -361,10 +361,18 @@ function OpenHardwareSensor(jsonObj) {
                 return value.Value;
             })
         }
-        knob.setProperty("valMin", minimum == null ? parseFloat(value.Min) : minimum);
-        knob.setProperty("valMax", maximum == null ? parseFloat(value.Max) : maximum);
+        knob.setProperty("valMin", getMinValue());
+        knob.setProperty("valMax", getMaxValue());
         knob.setProperty("val", parseFloat(value.Value));
         knob.commit();
+    }
+
+    function getMinValue() {
+        return minimum == null ? parseFloat(value.Min) : minimum;
+    }
+
+    function getMaxValue() {
+        return maximum == null ? parseFloat(value.Max) : maximum;
     }
 
     function getSensorName() {
