@@ -223,13 +223,25 @@ function OpenHardwareSensor(jsonObj) {
     }
 
     function drawSensor() {
-        type === "text" && value.Value && updateText();
-        type === "knob" && value.Value && updateKnob();
-        type === "line" && history && updateLine();
+        switch (type) {
+        case "knob":
+            value.Value && updateKnob();
+            break;
+        case "line":
+            history && updateLine(false);
+            break;
+        case "fill":
+            history && updateLine(true);
+            break;
+        case "text":
+        default:
+            value.Value && updateText();
+            break;
+        }
         $SD.setImage(context, canvas.toDataURL());
     }
 
-    function updateLine() {
+    function updateLine(doFill) {
         const ctx = canvas.getContext('2d');
         const height = ctx.canvas.height;
         const width = ctx.canvas.width;
@@ -282,11 +294,20 @@ function OpenHardwareSensor(jsonObj) {
             };
         };
 
+        var last_x = 0;
         ctx.beginPath();
         for (const h of history) {
             const x = w.shift();
             const y = height - (parseFloat(h.Value) - min) * scale;
             draw(x, y);
+            last_x = x;
+        }
+        if (doFill) {
+            draw(last_x, height);
+            draw(0, height);
+            ctx.closePath();
+            ctx.fillStyle = foreground;
+            ctx.fill();    
         }
         ctx.stroke();
 
