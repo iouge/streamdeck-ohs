@@ -330,6 +330,11 @@ ol.sdpi-item-value {
   text-align: center;
 }
 
+table.noborder, td.noborder {
+  border: none;
+  border-collapse: collapse;
+}
+
 table > caption {
   margin: 2px;
 }

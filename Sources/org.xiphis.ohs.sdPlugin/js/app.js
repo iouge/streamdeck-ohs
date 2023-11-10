@@ -113,7 +113,19 @@ const action = {
         if (settings.hasOwnProperty('sensor_background')) {
             sensor.setSensorBackground(settings.sensor_background);
         }
- 
+
+        if (settings.hasOwnProperty('sensor_valuecolour')) {
+            sensor.setSensorValueColour(settings.sensor_valuecolour);
+        }
+
+        if (settings.hasOwnProperty('sensor_gradicule')) {
+            sensor.setSensorGradicule(settings.sensor_gradicule);
+        }
+
+        if (settings.hasOwnProperty('sensor_fillcolour')) {
+            sensor.setSensorFillColour(settings.sensor_fillcolour);
+        }
+
         if (settings.hasOwnProperty('sensor_minimum')) {
             sensor.setSensorMinimum(settings.sensor_minimum);
         }
@@ -206,8 +218,11 @@ function OpenHardwareSensor(jsonObj) {
         history = [],
         max_history = 60,
         count = 0,
-        background = '#181818',
+        background = '#000000',
+        gradicule = '#181818',
         foreground = '#ff8800',
+        valueColour = '#ff8800',
+        fillColour = '#ff8800',
         minimum = null,
         maximum = null,
         knob;
@@ -252,7 +267,8 @@ function OpenHardwareSensor(jsonObj) {
         const fontSizeString = fontSize.toString();
         const valueStr = value.Value;
 
-        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = background;
+        ctx.fillRect(0, 0, width, height);
 
         let w = [];
         for (var wx = 0, wd = (width - 1) / (max_history + 0.1); wx <= width; wx += wd) {
@@ -265,7 +281,7 @@ function OpenHardwareSensor(jsonObj) {
         const scale = height / range;
 
 
-        ctx.strokeStyle = background;
+        ctx.strokeStyle = gradicule;
         ctx.lineWidth = 3.1
         ctx.beginPath();
         ctx.moveTo(0, height + min * scale);
@@ -285,7 +301,7 @@ function OpenHardwareSensor(jsonObj) {
 
         ctx.strokeStyle = foreground;
         ctx.lineJoin = "round";
-        ctx.lineWidth = 1.1;
+        ctx.lineWidth = 3.1;
         var draw;
         draw = function(x, y) {
             ctx.moveTo(x, y);
@@ -303,22 +319,22 @@ function OpenHardwareSensor(jsonObj) {
             last_x = x;
         }
         if (doFill) {
-            draw(last_x, height);
-            draw(0, height);
+            draw(last_x, height+1);
+            draw(0, height+1);
             ctx.closePath();
-            ctx.fillStyle = foreground;
+            ctx.fillStyle = fillColour;
             ctx.fill();    
         }
         ctx.stroke();
 
         ctx.font = fontSizeString + 'px sans-serif';
-        ctx.fillStyle = foreground;
-        ctx.strokeStyle = 'black';
+        ctx.fillStyle = valueColour;
+        ctx.strokeStyle = background;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.lineWidth = 3.1;
         ctx.shadowBlur = 3.8;
-        ctx.shadowColor = 'black';
+        ctx.shadowColor = background;
         ctx.strokeText(valueStr, centerX, centerY);
         ctx.lineWidth = 1;
         ctx.fillText(valueStr, centerX, centerY);
@@ -335,9 +351,10 @@ function OpenHardwareSensor(jsonObj) {
         const fontSize = 0.3 * smaller;
         const fontSizeString = fontSize.toString();
         const valueStr = value.Value;
-        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = background;
+        ctx.fillRect(0, 0, width, height);
         ctx.font = fontSizeString + 'px sans-serif';
-        ctx.fillStyle = foreground;
+        ctx.fillStyle = valueColour;
         ctx.strokeStyle = background;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -354,8 +371,11 @@ function OpenHardwareSensor(jsonObj) {
             knob.resize = function() {};
             knob.setProperty("angleStart", -0.75 * Math.PI);
             knob.setProperty("angleEnd", 0.75 * Math.PI);
-            knob.setProperty("colorBG", background);
-            knob.setProperty("colorFG", foreground);
+            knob.setProperty("background", background);
+            knob.setProperty("foreground", foreground);
+            knob.setProperty("gradicule", gradicule);
+            knob.setProperty("filling", fillColour);
+            knob.setProperty("colorValue", valueColour);
             knob.setProperty("trackWidth", 0.4);
             knob.setProperty("fnValueToString", function(ignore) {
                 return value.Value;
@@ -396,7 +416,7 @@ function OpenHardwareSensor(jsonObj) {
     function setSensorForeground(fg) {
         foreground = fg;
         if (knob) {
-            knob.setProperty("colorFG", foreground);
+            knob.setProperty("foreground", foreground);
         }
         drawSensor();
     }
@@ -404,7 +424,31 @@ function OpenHardwareSensor(jsonObj) {
     function setSensorBackground(bg) {
         background = bg;
         if (knob) {
-            knob.setProperty("colorBG", background);
+            knob.setProperty("background", background);
+        }
+        drawSensor();
+    }
+
+    function setSensorGradicule(fg) {
+        gradicule = fg;
+        if (knob) {
+            knob.setProperty("colorBG", gradicule);
+        }
+        drawSensor();
+    }
+
+    function setSensorFillColour(bg) {
+        fillColour = bg;
+        if (knob) {
+            knob.setProperty("colorFG", fillColour);
+        }
+        drawSensor();
+    }
+
+    function setSensorValueColour(fg) {
+        valueColour = fg;
+        if (knob) {
+            knob.setProperty("colorValue", valueColour);
         }
         drawSensor();
     }
@@ -451,7 +495,10 @@ function OpenHardwareSensor(jsonObj) {
         setSensorMinimum: setSensorMinimum,
         setSensorMaximum: setSensorMaximum,
         setSensorBackground: setSensorBackground,
-        setSensorForeground: setSensorForeground
+        setSensorForeground: setSensorForeground,
+        setSensorGradicule: setSensorGradicule,
+        setSensorFillColour: setSensorFillColour,
+        setSensorValueColour: setSensorValueColour
     }
 }
 

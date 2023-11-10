@@ -72,6 +72,8 @@
 				 * Properties of this bar graph.
 				 */
 				'_properties': {
+					'background': '#000000',
+					'foreground': '#ff8800',
 					'colorBG': '#181818',
 					'colorFG': '#ff8800',
 					'colorMarkers': '#888888',
@@ -137,6 +139,8 @@
 				'redraw': function() {
 					this.resize();
 					const properties = this._properties;
+					const background = properties.background;
+					const foreground = properties.foreground;
 					const colorTrack = properties.colorBG;
 					const colorFilling = properties.colorFG;
 					const colorMarkers = properties.colorMarkers;
@@ -164,7 +168,8 @@
 					/*
 					 * Clear the canvas.
 					 */
-					ctx.clearRect(0, 0, width, height);
+					ctx.fillStyle = background;
+					ctx.fillRect(0, 0, width, height);
 
 					/*
 					 * Check if markers should be drawn.
@@ -207,7 +212,7 @@
 					/*
 					 * Prepare for drawing the peaks.
 					 */
-					ctx.strokeStyle = colorFilling;
+					ctx.strokeStyle = foreground;
 
 					/*
 					 * Draw the peaks.
@@ -412,9 +417,12 @@
 					'angleEnd': 2.0 * Math.PI,
 					'angleOffset': -0.5 * Math.PI,
 					'angleStart': 0,
+					'background': '#000000',
+					'foreground': '#ff8800',
 					'colorBG': '#181818',
 					'colorFG': '#ff8800',
 					'colorLabel': '#ffffff',
+					'colorValue': '#ff8800',
 					'fnStringToValue': function(string) { return parseInt(string); },
 					'fnValueToString': function(value) { return value.toString(); },
 					'label': null,
@@ -503,9 +511,12 @@
 					const relValue = (value - valMin) / (valMax - valMin);
 					const relAngle = relValue * (angleEnd - angleStart);
 					const angleVal = actualStart + relAngle;
+					const foreground = properties.foreground;
+					const background = properties.background;
 					const colorTrack = properties.colorBG;
 					const colorFilling = properties.colorFG;
 					const colorLabel = properties.colorLabel;
+					const colorValue = properties.colorValue;
 					const textScale = properties.textScale;
 					const trackWidth = properties.trackWidth;
 					const height = this._height;
@@ -526,7 +537,8 @@
 					/*
 					 * Clear the canvas.
 					 */
-					ctx.clearRect(0, 0, width, height);
+					ctx.fillStyle = background;
+					ctx.fillRect(0, 0, width, height);
 
 					/*
 					 * Draw the track.
@@ -561,13 +573,13 @@
 					 * Draw the number.
 					 */
 					ctx.font = fontSizeString + 'px sans-serif';
-					ctx.fillStyle = colorFilling;
-					ctx.strokeStyle = 'black';
+					ctx.fillStyle = colorValue;
+					ctx.strokeStyle = background;
 					ctx.textAlign = 'center';
 					ctx.textBaseline = 'middle';
 					ctx.lineWidth = 3.1;
 					ctx.shadowBlur = 3.8;
-					ctx.shadowColor = 'black';
+					ctx.shadowColor = background;
 					ctx.strokeText(valueStr, centerX, centerY);
 					ctx.lineWidth = 1;
 					ctx.fillText(valueStr, centerX, centerY);
