@@ -31,10 +31,12 @@ Features:
 - Configure your Hardware Monitor to use port 8085 ( see [openhardware.js line 19](https://github.com/atcurtis/streamdeck-ohs/blob/master/Sources/org.xiphis.ohs.sdPlugin/propertyinspector/js/openhardware.js#L19) )
 
 ### Where to find Open Hardware Monitor/Libre Hardware Monitor
-- Libre Hardware Monitor (recommended): [https://github.com/LibreHardwareMonitor/LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor]
-- Official, outdated, Open Hardware Monitor source: [https://github.com/openhardwaremonitor/openhardwaremonitor](https://openhardwaremonitor.org/downloads/)
-- Active OHM-fork: [https://github.com/hexagon-oss/openhardwaremonitor/releases](https://github.com/hexagon-oss/openhardwaremonitor/releases)
+- Official but outdated, Open Hardware Monitor source: [https://github.com/openhardwaremonitor/openhardwaremonitor](https://openhardwaremonitor.org/downloads/)
+- Active Open Hardware Monitor fork: [https://github.com/hexagon-oss/openhardwaremonitor/releases](https://github.com/hexagon-oss/openhardwaremonitor/releases)
+- Libre Hardware Monitor, another fork of Open Hardware Monitor: [https://github.com/LibreHardwareMonitor/LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor)
+
+Note: There may be issues with using the official Open Hardware Monitor on modern computers since it has not been maintained since 2020. Please use one of the forks.
 
 ## To-Do:
 
-- Implement time-series graph of data
+- Improve properties UI
