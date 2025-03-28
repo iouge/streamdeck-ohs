@@ -16,7 +16,7 @@ var OpenHardware = {
             }
             return sensors;
         }
-        return $SD.readJson("http://localhost:8085/data.json")
+        return $SD.readJson("http://192.168.4.10:8085/data.json")
             .then((data) => enumerateData("", data));
     }
 };
